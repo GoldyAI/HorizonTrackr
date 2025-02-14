@@ -1,0 +1,30 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Start .NET API",
+            "type": "shell",
+            "command": "dotnet run",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": "$msCompile",
+            "options": {
+                "cwd": "${workspaceFolder}/backend-dotnet/HorizonTrackrAPI"
+            }
+        },
+        {
+            "label": "Start Angular",
+            "type": "shell",
+            "command": "ng serve",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "options": {
+                "cwd": "${workspaceFolder}/frontend-angular/HorizonTrackrUI"
+            }
+        }
+    ]
+}

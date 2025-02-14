@@ -1,0 +1,32 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.2.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "HorizonTrackr", "HorizonTrackr", "{2573E26A-F400-29EA-E727-EF2E549239F0}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "backend-dotnet", "backend-dotnet", "{8DE8D52A-C4C1-746F-0FD8-67D5B89BA0A2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HorizonTrackrAPI", "HorizonTrackr\backend-dotnet\HorizonTrackrAPI\HorizonTrackrAPI.csproj", "{42857A7A-C3C9-5AB5-7DF9-39959AAC9EB7}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{42857A7A-C3C9-5AB5-7DF9-39959AAC9EB7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{42857A7A-C3C9-5AB5-7DF9-39959AAC9EB7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{42857A7A-C3C9-5AB5-7DF9-39959AAC9EB7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{42857A7A-C3C9-5AB5-7DF9-39959AAC9EB7}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{8DE8D52A-C4C1-746F-0FD8-67D5B89BA0A2} = {2573E26A-F400-29EA-E727-EF2E549239F0}
+		{42857A7A-C3C9-5AB5-7DF9-39959AAC9EB7} = {8DE8D52A-C4C1-746F-0FD8-67D5B89BA0A2}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {F590F555-D5A4-4FA9-8F4E-092BBA0CF32F}
+	EndGlobalSection
+EndGlobal

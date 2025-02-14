@@ -1,0 +1,20 @@
+<div class="form-container">
+    <h3>Add a New Job</h3>
+    <form (ngSubmit)="addJob()" #jobForm="ngForm">
+        <label for="company">Company:</label>
+        <input type="text" id="company" [(ngModel)]="newJob.company" name="company" required>
+      
+        <label for="position">Position:</label>
+        <input type="text" id="position" [(ngModel)]="newJob.position" name="position" required>
+      
+        <label for="status">Status:</label>
+        <select id="status" [(ngModel)]="newJob.status" name="status">
+          <option value="Applied">Applied</option>
+          <option value="Interview">Interview</option>
+          <option value="Offer">Offer</option>
+          <option value="Rejected">Rejected</option>
+        </select>
+      
+        <button type="submit">Add Job</button>
+      </form>
+      

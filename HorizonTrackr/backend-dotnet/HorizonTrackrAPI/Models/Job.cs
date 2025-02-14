@@ -5,19 +5,20 @@ namespace HorizonTrackrAPI.Models
 {
     public class Job
     {
-        [Key]  // Primary Key
         public int Id { get; set; }
 
-        [Required]
-        public string Company { get; set; }
+        [Required(ErrorMessage = "Company is required")]
+        public string Company { get; set; } = string.Empty;
 
-        [Required]
-        public string Position { get; set; }
+        [Required(ErrorMessage = "Position is required")]
+        public string Position { get; set; } = string.Empty;
 
-        public string Status { get; set; } = "Applied";  // Default status
+        [Required(ErrorMessage = "Status is required")]
+        public string Status { get; set; } = "Applied";
 
+        [Required(ErrorMessage = "DateApplied is required")]
         public DateTime DateApplied { get; set; } = DateTime.UtcNow;
 
-        public string Notes { get; set; }  // Additional details
+        public string? Notes { get; set; }
     }
 }

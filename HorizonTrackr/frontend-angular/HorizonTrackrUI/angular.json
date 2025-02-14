@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "HorizonTrackUI": {
+    "HorizonTrackrUI": {
       "projectType": "application",
       "schematics": {},
       "root": "",
@@ -13,7 +13,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:application",
           "options": {
-            "outputPath": "dist/horizon-track-ui",
+            "outputPath": "dist/horizon-trackr-ui",
             "index": "src/index.html",
             "browser": "src/main.ts",
             "polyfills": [
@@ -29,12 +29,7 @@
             "styles": [
               "src/styles.css"
             ],
-            "scripts": [],
-            "server": "src/main.server.ts",
-            "outputMode": "server",
-            "ssr": {
-              "entry": "src/server.ts"
-            }
+            "scripts": []
           },
           "configurations": {
             "production": {
@@ -64,10 +59,10 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "HorizonTrackUI:build:production"
+              "buildTarget": "HorizonTrackrUI:build:production"
             },
             "development": {
-              "buildTarget": "HorizonTrackUI:build:development"
+              "buildTarget": "HorizonTrackrUI:build:development"
             }
           },
           "defaultConfiguration": "development"

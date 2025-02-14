@@ -1,0 +1,11 @@
+<div class="container">
+    <h2>Job Applications</h2>
+    <p *ngIf="loading">Loading jobs...</p>
+    <ul *ngIf="!loading && jobs.length">
+      <li *ngFor="let job of jobs">
+        <strong>{{ job.position }}</strong> at {{ job.company }} - {{ job.status }}
+      </li>
+    </ul>
+    <p *ngIf="!loading && jobs.length === 0">No jobs found.</p>
+  </div>
+  

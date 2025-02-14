@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("HorizonTrackrAPI")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+0226754b6e4296225b5c0f08399aa62aeaaeb811")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+e60366901b0f07319d545656ee913d79753c5831")]
 [assembly: System.Reflection.AssemblyProductAttribute("HorizonTrackrAPI")]
 [assembly: System.Reflection.AssemblyTitleAttribute("HorizonTrackrAPI")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

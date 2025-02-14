@@ -34,14 +34,20 @@ namespace HorizonTrackrAPI.Controllers
             return job;
         }
 
-        // POST: api/jobs
         [HttpPost]
-        public async Task<ActionResult<Job>> PostJob(Job job)
-        {
-            _context.Jobs.Add(job);
-            await _context.SaveChangesAsync();
-            return CreatedAtAction(nameof(GetJob), new { id = job.Id }, job);
-        }
+public async Task<ActionResult<Job>> PostJob(Job job)
+{
+    if (!ModelState.IsValid)
+    {
+        return BadRequest(ModelState); // ✅ Returns validation errors
+    }
+
+    _context.Jobs.Add(job);
+    await _context.SaveChangesAsync();
+
+    return CreatedAtAction(nameof(GetJob), new { id = job.Id }, job);
+}
+
 
         // PUT: api/jobs/5
         [HttpPut("{id}")]

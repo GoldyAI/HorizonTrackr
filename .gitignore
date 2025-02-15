@@ -1,0 +1,17 @@
+# Ignore SQLite database files
+*.db
+
+# Ignore compiled binaries and debug files
+bin/
+obj/
+
+# Ignore logs
+*.log
+
+# Ignore temporary or generated files
+*.pdb
+*.exe
+*.dll
+*.sourcelink.json
+ref/
+refint/

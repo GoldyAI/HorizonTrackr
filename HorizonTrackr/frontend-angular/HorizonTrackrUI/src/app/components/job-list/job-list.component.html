@@ -1,14 +1,43 @@
 <div class="container">
-    <h2>Job Applications</h2>
-    <p *ngIf="loading">Loading jobs...</p>
-    <ul *ngIf="!loading && jobs.length > 0">
-      <li *ngFor="let job of jobs">
-        <strong>{{ job.position }}</strong> at {{ job.company }} - {{ job.status }}
-        <button (click)="deleteJob(job.id)">🗑 Delete</button> <!-- ✅ Ensure this is present -->
-      </li>
-    </ul>
-    
-    <p *ngIf="!loading && jobs.length === 0">No jobs found.</p>
-    
-  </div>
+  <h2>Job Applications</h2>
   
+  <!-- ✅ Loading Message -->
+  <p *ngIf="loading">Loading jobs...</p>
+
+  <!-- ✅ Job List -->
+  <ul *ngIf="!loading && jobs.length > 0">
+    <li *ngFor="let job of jobs">
+      <strong>{{ job.position }}</strong> at {{ job.company }} - {{ job.status }}
+      <button (click)="editJob(job)">✏️ Edit</button> <!-- ✅ Edit Button -->
+      <button (click)="deleteJob(job.id)">🗑 Delete</button> <!-- ✅ Delete Button -->
+    </li>
+  </ul>
+
+  <!-- ✅ No Jobs Found Message -->
+  <p *ngIf="!loading && jobs.length === 0">No jobs found.</p>
+
+  <!-- ✅ Job Edit Form (Only visible when in edit mode and a job is selected) -->
+  <div *ngIf="editMode && selectedJob">
+    <h3>Edit Job</h3>
+    <form (ngSubmit)="updateJob()">
+      
+      <label for="company">Company:</label>
+      <input type="text" id="company" [(ngModel)]="selectedJob.company" name="company" required>
+
+      <label for="position">Position:</label>
+      <input type="text" id="position" [(ngModel)]="selectedJob.position" name="position" required>
+
+      <label for="status">Status:</label>
+      <select id="status" [(ngModel)]="selectedJob.status" name="status">
+        <option value="Applied">Applied</option>
+        <option value="Interview">Interview</option>
+        <option value="Offer">Offer</option>
+        <option value="Rejected">Rejected</option>
+      </select>
+
+      <button type="submit">💾 Save Changes</button>
+      <button type="button" (click)="cancelEdit()">❌ Cancel</button>
+    </form>
+  </div>
+
+</div>

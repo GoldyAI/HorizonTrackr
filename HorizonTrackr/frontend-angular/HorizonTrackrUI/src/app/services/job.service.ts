@@ -32,11 +32,13 @@ export class JobService {
     return this.http.post<Job>(this.apiUrl, job);
   }
 
-  updateJob(job: Job): Observable<void> {
-    return this.http.put<void>(`${this.apiUrl}/${job.id}`, job);
-  }
 
   deleteJob(id: number): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${id}`);
   }
+  updateJob(job: Job): Observable<Job> {
+    return this.http.put<Job>(`${this.apiUrl}/${job.id}`, job);
+  }
+  
+  
 }

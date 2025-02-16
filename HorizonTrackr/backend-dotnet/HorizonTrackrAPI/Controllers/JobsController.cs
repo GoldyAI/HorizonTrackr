@@ -59,15 +59,20 @@ public async Task<ActionResult<Job>> PostJob(Job job)
             return NoContent();
         }
 
-        // DELETE: api/jobs/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteJob(int id)
-        {
-            var job = await _context.Jobs.FindAsync(id);
-            if (job == null) return NotFound();
-            _context.Jobs.Remove(job);
-            await _context.SaveChangesAsync();
-            return NoContent();
-        }
+public async Task<IActionResult> DeleteJob(int id)
+{
+    var job = await _context.Jobs.FindAsync(id);
+    if (job == null)
+    {
+        return NotFound();
+    }
+
+    _context.Jobs.Remove(job);
+    await _context.SaveChangesAsync();
+
+    return NoContent();
+}
+
     }
 }

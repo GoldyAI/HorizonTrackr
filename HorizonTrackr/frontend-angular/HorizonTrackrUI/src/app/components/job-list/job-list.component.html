@@ -1,11 +1,14 @@
 <div class="container">
     <h2>Job Applications</h2>
     <p *ngIf="loading">Loading jobs...</p>
-    <ul *ngIf="!loading && jobs.length">
+    <ul *ngIf="!loading && jobs.length > 0">
       <li *ngFor="let job of jobs">
         <strong>{{ job.position }}</strong> at {{ job.company }} - {{ job.status }}
+        <button (click)="deleteJob(job.id)">🗑 Delete</button> <!-- ✅ Ensure this is present -->
       </li>
     </ul>
+    
     <p *ngIf="!loading && jobs.length === 0">No jobs found.</p>
+    
   </div>
   

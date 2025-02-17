@@ -20,42 +20,54 @@ export class JobFormComponent {
     company: '',
     position: '',
     status: 'Applied',
-    dateApplied: new Date().toISOString(),
+    dateApplied: '',
     notes: ''
   };
-  
+
   constructor(private jobService: JobService) {}
 
+  /** ✅ Method to Add a Job **/
   addJob(): void {
-    console.log('Submitting Job:', this.newJob); 
+    if (!this.newJob.company || !this.newJob.position || !this.newJob.dateApplied) {
+      return; // Prevent empty submission
+    }
+
+    // ✅ Convert dateApplied to ISO format for backend compatibility
+    this.newJob.dateApplied = new Date(this.newJob.dateApplied).toISOString();
 
     this.jobService.addJob(this.newJob).subscribe(
       (job) => {
         console.log('Job successfully added:', job);
         this.jobAdded.emit(job);
-        this.successMessage = 'Job successfully added! 🎉';
+        this.successMessage = '🎉 Job successfully added!';
+
         this.resetForm();
+
         setTimeout(() => {
           this.successMessage = '';
         }, 3000);
       },
       (error) => {
         console.error('Error adding job:', error.error);
-        if (error.error && error.error.errors) {
-          console.error('Validation Errors:', error.error.errors);
-        }
       }
     );
   }
 
+  /** ✅ Method to Reset the Form **/
   resetForm(): void {
     this.newJob = {
       id: 0,
       company: '',
       position: '',
       status: 'Applied',
-      dateApplied: new Date().toISOString(),
+      dateApplied: '', // ✅ Reset date properly
       notes: ''
     };
+
+    // ✅ Reset form validation errors
+    const formElement = document.querySelector('form');
+    if (formElement) {
+      formElement.reset();
+    }
   }
 }

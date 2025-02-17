@@ -1,20 +1,68 @@
-<div class="form-container">
-    <h3>Add a New Job</h3>
-    <form (ngSubmit)="addJob()" #jobForm="ngForm">
-        <label for="company">Company:</label>
-        <input type="text" id="company" [(ngModel)]="newJob.company" name="company" required>
-      
-        <label for="position">Position:</label>
-        <input type="text" id="position" [(ngModel)]="newJob.position" name="position" required>
-      
-        <label for="status">Status:</label>
-        <select id="status" [(ngModel)]="newJob.status" name="status">
-          <option value="Applied">Applied</option>
-          <option value="Interview">Interview</option>
-          <option value="Offer">Offer</option>
-          <option value="Rejected">Rejected</option>
-        </select>
-      
-        <button type="submit">Add Job</button>
+<div class="container mt-4">
+  <div class="card shadow-lg">
+    <div class="card-header bg-primary text-white">
+      <h3 class="mb-0">📋 Add New Job</h3>
+    </div>
+
+    <div class="card-body">
+      <form (ngSubmit)="addJob()" #jobForm="ngForm">
+        
+        <!-- ✅ Company Name -->
+        <div class="mb-3">
+          <label for="company" class="form-label">Company Name</label>
+          <input type="text" id="company" class="form-control" [(ngModel)]="newJob.company" name="company" required>
+          <div *ngIf="jobForm.submitted && !newJob.company" class="text-danger small">
+            Company name is required.
+          </div>
+        </div>
+
+        <!-- ✅ Job Position -->
+        <div class="mb-3">
+          <label for="position" class="form-label">Job Position</label>
+          <input type="text" id="position" class="form-control" [(ngModel)]="newJob.position" name="position" required>
+          <div *ngIf="jobForm.submitted && !newJob.position" class="text-danger small">
+            Job position is required.
+          </div>
+        </div>
+
+        <!-- ✅ Job Status Dropdown -->
+        <div class="mb-3">
+          <label for="status" class="form-label">Application Status</label>
+          <select id="status" class="form-select" [(ngModel)]="newJob.status" name="status">
+            <option value="Applied">Applied</option>
+            <option value="Interview">Interview</option>
+            <option value="Offer">Offer</option>
+            <option value="Rejected">Rejected</option>
+          </select>
+        </div>
+
+        <!-- ✅ Date Applied -->
+        <div class="mb-3">
+          <label for="dateApplied" class="form-label">Date Applied</label>
+          <input type="date" id="dateApplied" class="form-control" [(ngModel)]="newJob.dateApplied" name="dateApplied" required>
+          <div *ngIf="jobForm.submitted && !newJob.dateApplied" class="text-danger small">
+            Date is required.
+          </div>
+        </div>
+
+        <!-- ✅ Notes -->
+        <div class="mb-3">
+          <label for="notes" class="form-label">Notes</label>
+          <textarea id="notes" class="form-control" [(ngModel)]="newJob.notes" name="notes" rows="3"></textarea>
+        </div>
+
+        <!-- ✅ Buttons -->
+        <div class="d-flex justify-content-end">
+          <button type="submit" class="btn btn-success me-2">💾 Add Job</button>
+          <button type="button" class="btn btn-secondary" (click)="resetForm()">🔄 Reset</button>
+        </div>
+
       </form>
-      
+    </div>
+  </div>
+
+  <!-- ✅ Success Message -->
+  <div *ngIf="successMessage" class="alert alert-success mt-3 text-center">
+    {{ successMessage }}
+  </div>
+</div>

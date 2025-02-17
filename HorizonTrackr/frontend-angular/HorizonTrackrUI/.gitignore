@@ -40,3 +40,7 @@ testem.log
 # System files
 .DS_Store
 Thumbs.db
+
+# Ignore SQLite temporary files
+HorizonTrackr.db-shm
+HorizonTrackr.db-wal

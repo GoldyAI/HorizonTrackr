@@ -1,23 +1,48 @@
 <div class="container mt-4">
   <h2 class="text-center mb-3">📋 Job Applications</h2>
 
+  <!-- ✅ Search & Filter -->
+  <div class="row mb-3">
+    <div class="col-md-6">
+      <input 
+        type="text" 
+        class="form-control" 
+        placeholder="🔍 Search by Company or Position..." 
+        [(ngModel)]="searchQuery"
+        (input)="onSearchChange()"
+      />
+    </div>
+    <div class="col-md-4">
+      <select class="form-select" [(ngModel)]="selectedStatus" (change)="filterJobs()">
+        <option value="">📌 Filter by Status</option>
+        <option value="Applied">Applied</option>
+        <option value="Interview">Interview</option>
+        <option value="Offer">Offer</option>
+        <option value="Rejected">Rejected</option>
+      </select>
+    </div>
+    <div class="col-md-2">
+      <button class="btn btn-secondary w-100" (click)="resetFilters()">♻️ Reset Filters</button>
+    </div>
+  </div>
+
   <!-- ✅ Loading Message -->
   <p *ngIf="loading" class="text-center text-primary">Loading jobs...</p>
 
   <!-- ✅ Job List (Bootstrap Table) -->
-  <div *ngIf="!loading && jobs.length > 0">
+  <div *ngIf="!loading && filteredJobs.length > 0">
     <table class="table table-hover table-bordered">
       <thead class="table-dark">
         <tr>
           <th>Company</th>
           <th>Position</th>
           <th>Status</th>
-          <th>Date Applied</th>  <!-- ✅ Added Date Column -->
+          <th>Date Applied</th>
           <th>Actions</th>
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let job of jobs">
+        <tr *ngFor="let job of filteredJobs">
           <td>{{ job.company }}</td>
           <td>{{ job.position }}</td>
           <td>
@@ -25,7 +50,7 @@
               {{ job.status }}
             </span>
           </td>
-          <td>{{ formatDate(job.dateApplied) }}</td>  <!-- ✅ Format Date Properly -->
+          <td>{{ formatDate(job.dateApplied) }}</td>
           <td>
             <button class="btn btn-sm btn-warning me-2" (click)="editJob(job)">✏️ Edit</button>
             <button class="btn btn-sm btn-danger" (click)="deleteJob(job.id)">🗑 Delete</button>
@@ -36,51 +61,51 @@
   </div>
 
   <!-- ✅ No Jobs Found Message -->
-  <p *ngIf="!loading && jobs.length === 0" class="text-center text-muted">
-    🚀 No jobs found. Start adding new applications!
+  <p *ngIf="!loading && filteredJobs.length === 0" class="text-center text-muted">
+    🚀 No jobs found. Try adjusting your search or adding a new job!
   </p>
 
-<!-- ✅ Bootstrap Modal for Editing Jobs -->
-<div class="modal fade" id="editModal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">✏️ Edit Job</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <!-- ✅ Wrap form inside *ngIf="selectedJob" to prevent errors -->
-        <form *ngIf="selectedJob" (ngSubmit)="updateJob()">
-          <div class="mb-3">
-            <label for="company" class="form-label">Company:</label>
-            <input type="text" id="company" class="form-control" [(ngModel)]="selectedJob.company" name="company" required>
-          </div>
+  <!-- ✅ Bootstrap Modal for Editing Jobs -->
+  <div class="modal fade" id="editModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">✏️ Edit Job</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form *ngIf="selectedJob" (ngSubmit)="updateJob()">
+            <div class="mb-3">
+              <label for="company" class="form-label">Company:</label>
+              <input type="text" id="company" class="form-control" [(ngModel)]="selectedJob.company" name="company" required>
+            </div>
 
-          <div class="mb-3">
-            <label for="position" class="form-label">Position:</label>
-            <input type="text" id="position" class="form-control" [(ngModel)]="selectedJob.position" name="position" required>
-          </div>
+            <div class="mb-3">
+              <label for="position" class="form-label">Position:</label>
+              <input type="text" id="position" class="form-control" [(ngModel)]="selectedJob.position" name="position" required>
+            </div>
 
-          <div class="mb-3">
-            <label for="status" class="form-label">Status:</label>
-            <select id="status" class="form-select" [(ngModel)]="selectedJob.status" name="status">
-              <option value="Applied">Applied</option>
-              <option value="Interview">Interview</option>
-              <option value="Offer">Offer</option>
-              <option value="Rejected">Rejected</option>
-            </select>
-          </div>
+            <div class="mb-3">
+              <label for="status" class="form-label">Status:</label>
+              <select id="status" class="form-select" [(ngModel)]="selectedJob.status" name="status">
+                <option value="Applied">Applied</option>
+                <option value="Interview">Interview</option>
+                <option value="Offer">Offer</option>
+                <option value="Rejected">Rejected</option>
+              </select>
+            </div>
 
-          <div class="mb-3">
-            <label for="dateApplied" class="form-label">Date Applied:</label>
-            <input type="date" id="dateApplied" class="form-control" [(ngModel)]="selectedJob.dateApplied" name="dateApplied" required>
-          </div>
+            <div class="mb-3">
+              <label for="dateApplied" class="form-label">Date Applied:</label>
+              <input type="date" id="dateApplied" class="form-control" [(ngModel)]="selectedJob.dateApplied" name="dateApplied" required>
+            </div>
 
-          <button type="submit" class="btn btn-success">💾 Save Changes</button>
-        </form>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">❌ Close</button>
+            <button type="submit" class="btn btn-success">💾 Save Changes</button>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">❌ Close</button>
+        </div>
       </div>
     </div>
   </div>

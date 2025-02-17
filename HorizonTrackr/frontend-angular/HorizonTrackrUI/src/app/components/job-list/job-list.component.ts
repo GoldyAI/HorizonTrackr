@@ -2,37 +2,51 @@ import { Component, OnInit } from '@angular/core';
 import { JobService, Job } from '../../services/job.service';
 import { CommonModule } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
-import { FormsModule } from '@angular/forms'; // ✅ Ensure FormsModule is included
-import * as bootstrap from 'bootstrap'; // ✅ Import Bootstrap for modal handling
+import { FormsModule } from '@angular/forms';
+import { debounceTime } from 'rxjs/operators';
+import { Subject } from 'rxjs';
+import * as bootstrap from 'bootstrap';
 
 @Component({
   selector: 'app-job-list',
   standalone: true,
-  imports: [CommonModule, HttpClientModule, FormsModule], // ✅ Imported FormsModule for [(ngModel)]
-  templateUrl: './job-list.component.html', // ✅ Use a separate HTML file
-  styleUrls: ['./job-list.component.css'] // ✅ Use a separate CSS file for styling
+  imports: [CommonModule, HttpClientModule, FormsModule],
+  templateUrl: './job-list.component.html',
+  styleUrls: ['./job-list.component.css']
 })
 export class JobListComponent implements OnInit {
   jobs: Job[] = [];
+  filteredJobs: Job[] = [];
   loading: boolean = true;
-  selectedJob: Job | null = null; // ✅ Tracks the job being edited
-  editMode: boolean = false; // ✅ Indicates if editing mode is active
+  selectedJob: Job | null = null;
+  editMode: boolean = false;
+
+  searchQuery: string = ''; // ✅ Search Input Binding
+  selectedStatus: string = ''; // ✅ Filter Dropdown Binding
+
+  private searchSubject = new Subject<void>(); // ✅ Used to debounce filtering
 
   constructor(private jobService: JobService) {}
 
   ngOnInit(): void {
     this.loadJobs();
+    
+    // ✅ Add debounce time to search/filter for a smoother experience
+    this.searchSubject.pipe(debounceTime(500)).subscribe(() => {
+      this.filterJobs();
+    });
   }
 
   /** ✅ Fetch jobs from the API **/
   loadJobs(): void {
     this.jobService.getJobs().subscribe({
       next: (data: Job[]) => {
-        // ✅ Format dates before displaying
+        // ✅ Ensure dates are formatted correctly before displaying
         this.jobs = data.map(job => ({
           ...job,
           dateApplied: this.formatDate(job.dateApplied)
         }));
+        this.filteredJobs = [...this.jobs]; // ✅ Initialize filtered list
         this.loading = false;
       },
       error: (error: any) => {
@@ -42,11 +56,29 @@ export class JobListComponent implements OnInit {
     });
   }
 
-  /** ✅ Handle a new job added **/
-  onJobAdded(job: Job): void {
-    console.log("New job added:", job);
-    job.dateApplied = this.formatDate(job.dateApplied); // ✅ Ensure formatted date
-    this.jobs.push(job); // ✅ Add the new job to the list instantly
+  /** ✅ Trigger filtering with debounce **/
+  onSearchChange(): void {
+    this.searchSubject.next();
+  }
+
+  /** ✅ Filter jobs based on search input & selected status **/
+  filterJobs(): void {
+    this.filteredJobs = this.jobs.filter(job => {
+      const matchesSearch =
+        job.company.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
+        job.position.toLowerCase().includes(this.searchQuery.toLowerCase());
+
+      const matchesStatus = this.selectedStatus ? job.status === this.selectedStatus : true;
+
+      return matchesSearch && matchesStatus;
+    });
+  }
+
+  /** ✅ Reset search and filters **/
+  resetFilters(): void {
+    this.searchQuery = '';
+    this.selectedStatus = '';
+    this.filteredJobs = [...this.jobs];
   }
 
   /** ✅ Delete a job **/
@@ -54,16 +86,18 @@ export class JobListComponent implements OnInit {
     if (confirm("Are you sure you want to delete this job?")) {
       this.jobService.deleteJob(id).subscribe({
         next: () => {
-          this.jobs = this.jobs.filter(job => job.id !== id); // ✅ Instantly update UI
+          // ✅ Remove from both `jobs` and `filteredJobs` to update UI instantly
+          this.jobs = this.jobs.filter(job => job.id !== id);
+          this.filteredJobs = this.filteredJobs.filter(job => job.id !== id);
         },
         error: (error) => console.error("Error deleting job:", error)
       });
     }
   }
 
-  /** ✅ Edit a job (Opens Bootstrap Modal) **/
+  /** ✅ Edit a job **/
   editJob(job: Job): void {
-    this.selectedJob = { ...job }; // ✅ Clone job object to prevent direct mutations
+    this.selectedJob = { ...job };
     this.editMode = true;
 
     // ✅ Open Bootstrap modal
@@ -82,11 +116,11 @@ export class JobListComponent implements OnInit {
 
     this.jobService.updateJob(this.selectedJob).subscribe({
       next: (updatedJob: Job) => {
-        // ✅ Ensure formatted date on update
         updatedJob.dateApplied = this.formatDate(updatedJob.dateApplied);
 
-        // ✅ Update job in the list instantly
+        // ✅ Update job in the main and filtered lists instantly
         this.jobs = this.jobs.map(job => job.id === updatedJob.id ? updatedJob : job);
+        this.filteredJobs = this.filteredJobs.map(job => job.id === updatedJob.id ? updatedJob : job);
 
         this.closeModal();
       },
@@ -108,14 +142,9 @@ export class JobListComponent implements OnInit {
 
   /** ✅ Format dates for display **/
   formatDate(dateString: string | undefined): string {
-    if (!dateString) return 'N/A'; // ✅ Prevents errors if date is missing
-
+    if (!dateString) return 'N/A';
     const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
-    });
+    return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
   }
 
   /** ✅ Get Bootstrap class for job status **/

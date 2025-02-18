@@ -20,18 +20,19 @@ export class JobListComponent implements OnInit {
   loading: boolean = true;
   selectedJob: Job | null = null;
   editMode: boolean = false;
+  newJob: Job = { id: 0, company: '', position: '', status: 'Applied', dateApplied: '', notes: '' };
 
-  searchQuery: string = ''; // ✅ Search input binding
-  selectedStatus: string = ''; // ✅ Status filter binding
+  searchQuery: string = '';
+  selectedStatus: string = '';
+  sortColumn: string = 'dateApplied';
+  sortDirection: string = 'desc';
 
-  private searchSubject = new Subject<void>(); // ✅ Used to debounce filtering
+  private searchSubject = new Subject<void>();
 
   constructor(private jobService: JobService) {}
 
   ngOnInit(): void {
     this.loadJobs();
-
-    // ✅ Add debounce time to search/filter for a smoother experience
     this.searchSubject.pipe(debounceTime(300)).subscribe(() => {
       this.filterJobs();
     });
@@ -45,8 +46,9 @@ export class JobListComponent implements OnInit {
           ...job,
           dateApplied: this.formatDate(job.dateApplied)
         }));
-        this.filteredJobs = [...this.jobs]; // ✅ Initialize filtered list
+        this.filteredJobs = [...this.jobs];
         this.loading = false;
+        this.sortJobs(this.sortColumn);
       },
       error: (error: any) => {
         console.error('Error fetching jobs:', error);
@@ -68,9 +70,10 @@ export class JobListComponent implements OnInit {
         job.position.toLowerCase().includes(this.searchQuery.toLowerCase());
 
       const matchesStatus = this.selectedStatus ? job.status === this.selectedStatus : true;
-
       return matchesSearch && matchesStatus;
     });
+
+    this.sortJobs(this.sortColumn);
   }
 
   /** ✅ Reset search and filters **/
@@ -78,7 +81,80 @@ export class JobListComponent implements OnInit {
     this.searchQuery = '';
     this.selectedStatus = '';
     this.filteredJobs = [...this.jobs];
+    this.sortJobs(this.sortColumn);
   }
+
+  /** ✅ Sorting logic for columns **/
+  sortJobs(column: string): void {
+    if (this.sortColumn === column) {
+      this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
+    } else {
+      this.sortColumn = column;
+      this.sortDirection = 'asc';
+    }
+
+    this.filteredJobs.sort((a, b) => {
+      let valueA = a[column as keyof Job] ?? '';
+      let valueB = b[column as keyof Job] ?? '';
+
+      if (column === 'dateApplied') {
+        valueA = new Date(valueA as string).getTime();
+        valueB = new Date(valueB as string).getTime();
+      }
+
+      if (typeof valueA === 'string' && typeof valueB === 'string') {
+        return this.sortDirection === 'asc' ? valueA.localeCompare(valueB) : valueB.localeCompare(valueA);
+      }
+
+      return this.sortDirection === 'asc' ? (valueA as number) - (valueB as number) : (valueB as number) - (valueA as number);
+    });
+  }
+
+  /** ✅ Open Bootstrap Modal for Adding a New Job **/
+  openAddJobModal(): void {
+    this.newJob = { id: 0, company: '', position: '', status: 'Applied', dateApplied: '', notes: '' };
+
+    setTimeout(() => {
+      const modalElement = document.getElementById("addJobModal") as HTMLElement;
+      if (modalElement) {
+        const modal = new bootstrap.Modal(modalElement);
+        modal.show();
+      }
+    }, 100);
+  }
+
+  /** ✅ Add a new job **/
+  addJob(): void {
+    if (!this.newJob.company || !this.newJob.position || !this.newJob.dateApplied) {
+      alert("Please fill in all required fields.");
+      return;
+    }
+
+    this.jobService.addJob(this.newJob).subscribe({
+      next: (job: Job) => {
+        job.dateApplied = this.formatDate(job.dateApplied);
+        this.jobs.push(job);
+        this.filteredJobs.push(job);
+        this.closeModal('addJobModal');
+      },
+      error: (error) => console.error("Error adding job:", error)
+    });
+  }
+  /** ✅ Edit a job (opens the modal) **/
+editJob(job: Job): void {
+  this.selectedJob = { ...job }; // Clone the job to avoid direct mutations
+  this.editMode = true;
+
+  // ✅ Open Bootstrap modal for editing
+  setTimeout(() => {
+    const modalElement = document.getElementById("editJobModal") as HTMLElement;
+    if (modalElement) {
+      const modal = new bootstrap.Modal(modalElement);
+      modal.show();
+    }
+  }, 100);
+}
+
 
   /** ✅ Delete a job **/
   deleteJob(id: number): void {
@@ -93,12 +169,11 @@ export class JobListComponent implements OnInit {
     }
   }
 
-  /** ✅ Edit a job **/
-  editJob(job: Job): void {
+  /** ✅ Open Edit Job Modal **/
+  openEditJobModal(job: Job): void {
     this.selectedJob = { ...job };
     this.editMode = true;
 
-    // ✅ Open Bootstrap modal
     setTimeout(() => {
       const modalElement = document.getElementById("editModal") as HTMLElement;
       if (modalElement) {
@@ -116,31 +191,30 @@ export class JobListComponent implements OnInit {
       next: (updatedJob: Job) => {
         updatedJob.dateApplied = this.formatDate(updatedJob.dateApplied);
 
-        // ✅ Update job in the main and filtered lists instantly
         this.jobs = this.jobs.map(job => job.id === updatedJob.id ? updatedJob : job);
         this.filteredJobs = this.filteredJobs.map(job => job.id === updatedJob.id ? updatedJob : job);
 
-        this.closeModal();
+        this.closeModal('editModal');
       },
       error: (error) => console.error("Error updating job:", error)
     });
   }
 
   /** ✅ Close Bootstrap Modal **/
-  closeModal(): void {
+  closeModal(modalId: string): void {
     this.selectedJob = null;
     this.editMode = false;
 
-    const modalElement = document.getElementById("editModal") as HTMLElement;
+    const modalElement = document.getElementById(modalId) as HTMLElement;
     if (modalElement) {
       const modal = bootstrap.Modal.getInstance(modalElement);
       modal?.hide();
     }
   }
 
-  /** ✅ Cancel Edit Mode (Fix for missing method) **/
+  /** ✅ Cancel Edit Mode **/
   cancelEdit(): void {
-    this.closeModal();
+    this.closeModal('editModal');
   }
 
   /** ✅ Format dates for display **/

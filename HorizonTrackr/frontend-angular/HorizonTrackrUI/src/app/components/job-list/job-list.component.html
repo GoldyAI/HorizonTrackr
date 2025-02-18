@@ -1,9 +1,9 @@
 <div class="container mt-4">
   <h2 class="text-center mb-3">📋 Job Applications</h2>
 
-  <!-- ✅ Search & Filter -->
+  <!-- ✅ Search, Filter & Add Job -->
   <div class="row mb-3">
-    <div class="col-md-6">
+    <div class="col-md-4">
       <input 
         type="text" 
         class="form-control" 
@@ -12,7 +12,7 @@
         (input)="onSearchChange()"
       />
     </div>
-    <div class="col-md-4">
+    <div class="col-md-3">
       <select class="form-select" [(ngModel)]="selectedStatus" (change)="filterJobs()">
         <option value="">📌 Filter by Status</option>
         <option value="Applied">Applied</option>
@@ -21,8 +21,12 @@
         <option value="Rejected">Rejected</option>
       </select>
     </div>
-    <div class="col-md-2">
+    <div class="col-md-3">
       <button class="btn btn-secondary w-100" (click)="resetFilters()">♻️ Reset Filters</button>
+    </div>
+    <div class="col-md-2 text-end">
+      <!-- ✅ Add Job Button -->
+      <button class="btn btn-success w-100" data-bs-toggle="modal" data-bs-target="#addJobModal">➕ Add Job</button>
     </div>
   </div>
 
@@ -34,10 +38,18 @@
     <table class="table table-hover table-bordered">
       <thead class="table-dark">
         <tr>
-          <th>Company</th>
-          <th>Position</th>
-          <th>Status</th>
-          <th>Date Applied</th>
+          <th (click)="sortJobs('company')" class="sortable">
+            Company <span *ngIf="sortColumn === 'company'">{{ sortDirection === 'asc' ? '🔼' : '🔽' }}</span>
+          </th>
+          <th (click)="sortJobs('position')" class="sortable">
+            Position <span *ngIf="sortColumn === 'position'">{{ sortDirection === 'asc' ? '🔼' : '🔽' }}</span>
+          </th>
+          <th (click)="sortJobs('status')" class="sortable">
+            Status <span *ngIf="sortColumn === 'status'">{{ sortDirection === 'asc' ? '🔼' : '🔽' }}</span>
+          </th>
+          <th (click)="sortJobs('dateApplied')" class="sortable">
+            Date Applied <span *ngIf="sortColumn === 'dateApplied'">{{ sortDirection === 'asc' ? '🔼' : '🔽' }}</span>
+          </th>
           <th>Actions</th>
         </tr>
       </thead>
@@ -50,9 +62,10 @@
               {{ job.status }}
             </span>
           </td>
-          <td>{{ job.dateApplied ? formatDate(job.dateApplied) : 'N/A' }}</td> <!-- ✅ Prevents empty dates -->
+          <td>{{ job.dateApplied ? formatDate(job.dateApplied) : 'N/A' }}</td>
           <td>
-            <button class="btn btn-sm btn-warning me-2" (click)="editJob(job)">✏️ Edit</button>
+            <!-- ✅ Open Edit Modal Correctly -->
+            <button class="btn btn-sm btn-warning me-2" data-bs-toggle="modal" data-bs-target="#editJobModal" (click)="editJob(job)">✏️ Edit</button>
             <button class="btn btn-sm btn-danger" (click)="deleteJob(job.id)">🗑 Delete</button>
           </td>
         </tr>
@@ -65,29 +78,29 @@
     🚀 No jobs found. Try adjusting your search or adding a new job!
   </p>
 
-  <!-- ✅ Bootstrap Modal for Editing Jobs -->
-  <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+  <!-- ✅ Bootstrap Modal for Adding a Job -->
+  <div class="modal fade" id="addJobModal" tabindex="-1" aria-labelledby="addJobModalLabel" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title">✏️ Edit Job</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" (click)="cancelEdit()"></button>
+          <h5 class="modal-title" id="addJobModalLabel">➕ Add New Job</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
-          <form *ngIf="selectedJob" (ngSubmit)="updateJob()">
+          <form (ngSubmit)="addJob()">
             <div class="mb-3">
               <label for="company" class="form-label">Company:</label>
-              <input type="text" id="company" class="form-control" [(ngModel)]="selectedJob.company" name="company" required>
+              <input type="text" id="company" class="form-control" [(ngModel)]="newJob.company" name="company" required>
             </div>
 
             <div class="mb-3">
               <label for="position" class="form-label">Position:</label>
-              <input type="text" id="position" class="form-control" [(ngModel)]="selectedJob.position" name="position" required>
+              <input type="text" id="position" class="form-control" [(ngModel)]="newJob.position" name="position" required>
             </div>
 
             <div class="mb-3">
               <label for="status" class="form-label">Status:</label>
-              <select id="status" class="form-select" [(ngModel)]="selectedJob.status" name="status">
+              <select id="status" class="form-select" [(ngModel)]="newJob.status" name="status">
                 <option value="Applied">Applied</option>
                 <option value="Interview">Interview</option>
                 <option value="Offer">Offer</option>
@@ -97,14 +110,53 @@
 
             <div class="mb-3">
               <label for="dateApplied" class="form-label">Date Applied:</label>
-              <input type="date" id="dateApplied" class="form-control" [(ngModel)]="selectedJob.dateApplied" name="dateApplied" required>
+              <input type="date" id="dateApplied" class="form-control" [(ngModel)]="newJob.dateApplied" name="dateApplied" required>
+            </div>
+
+            <button type="submit" class="btn btn-primary">✅ Add Job</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ✅ Bootstrap Modal for Editing a Job -->
+  <div class="modal fade" id="editJobModal" tabindex="-1" aria-labelledby="editJobModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="editJobModalLabel">✏️ Edit Job</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" (click)="cancelEdit()"></button>
+        </div>
+        <div class="modal-body">
+          <form *ngIf="selectedJob" (ngSubmit)="updateJob()">
+            <div class="mb-3">
+              <label for="editCompany" class="form-label">Company:</label>
+              <input type="text" id="editCompany" class="form-control" [(ngModel)]="selectedJob.company" name="company" required>
+            </div>
+
+            <div class="mb-3">
+              <label for="editPosition" class="form-label">Position:</label>
+              <input type="text" id="editPosition" class="form-control" [(ngModel)]="selectedJob.position" name="position" required>
+            </div>
+
+            <div class="mb-3">
+              <label for="editStatus" class="form-label">Status:</label>
+              <select id="editStatus" class="form-select" [(ngModel)]="selectedJob.status" name="status">
+                <option value="Applied">Applied</option>
+                <option value="Interview">Interview</option>
+                <option value="Offer">Offer</option>
+                <option value="Rejected">Rejected</option>
+              </select>
+            </div>
+
+            <div class="mb-3">
+              <label for="editDateApplied" class="form-label">Date Applied:</label>
+              <input type="date" id="editDateApplied" class="form-control" [(ngModel)]="selectedJob.dateApplied" name="dateApplied" required>
             </div>
 
             <button type="submit" class="btn btn-success">💾 Save Changes</button>
           </form>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" (click)="cancelEdit()">❌ Close</button>
         </div>
       </div>
     </div>

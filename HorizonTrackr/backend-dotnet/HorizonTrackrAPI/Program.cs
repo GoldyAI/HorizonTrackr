@@ -1,9 +1,43 @@
 using HorizonTrackrAPI.Data;
+using HorizonTrackrAPI.Models;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// ✅ Add CORS Policy for Both HTTP and HTTPS
+// ✅ Add Database Context
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+// ✅ Configure Identity for User Authentication
+builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
+    .AddEntityFrameworkStores<ApplicationDbContext>()
+    .AddDefaultTokenProviders();
+
+// ✅ Configure JWT Authentication
+var key = Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]);
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = builder.Configuration["Jwt:Issuer"],
+            ValidAudience = builder.Configuration["Jwt:Audience"],
+            IssuerSigningKey = new SymmetricSecurityKey(key)
+        };
+    });
+
+builder.Services.AddAuthorization();
+
+// ✅ Add CORS Policy for Angular & Backend Communication
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAngularApp",
@@ -16,9 +50,7 @@ builder.Services.AddCors(options =>
         });
 });
 
-// Add services to the container
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
+// ✅ Add Controllers
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -28,7 +60,11 @@ var app = builder.Build();
 // ✅ Apply CORS Policy
 app.UseCors("AllowAngularApp");
 
-// Configure the HTTP request pipeline
+// ✅ Enable Authentication & Authorization
+app.UseAuthentication();
+app.UseAuthorization();
+
+// ✅ Configure the HTTP request pipeline
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -36,8 +72,6 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
-

@@ -1,0 +1,15 @@
+/* ✅ Navbar Styling */
+.navbar-brand {
+    font-weight: bold;
+  }
+  
+  /* ✅ Sidebar Styling */
+  aside .card {
+    border-left: 4px solid #007bff;
+  }
+  
+  aside input,
+  aside select {
+    font-size: 0.9rem;
+  }
+  

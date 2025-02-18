@@ -1,22 +1,32 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component } from '@angular/core';
+import { FormsModule } from '@angular/forms'; // ✅ Import FormsModule for ngModel
+import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
 import { JobListComponent } from './components/job-list/job-list.component';
-import { JobFormComponent } from './components/job-form/job-form.component'; // ✅ Import JobFormComponent
-import { Job } from './services/job.service';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [JobListComponent, JobFormComponent], // ✅ Ensure JobFormComponent is included
+  imports: [CommonModule, FormsModule, RouterModule, JobListComponent], // ✅ Import FormsModule to fix ngModel error
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })
 export class AppComponent {
-  title = 'HorizonTrackrUI';
+  title = 'HorizonTrackr';
 
-  @ViewChild(JobListComponent) jobList!: JobListComponent;
+  // ✅ Define the search and filter properties
+  searchQuery: string = '';
+  selectedStatus: string = '';
 
-  onJobAdded(newJob: Job): void {
-    console.log('New job added:', newJob);
-    this.jobList.loadJobs();
+  // ✅ Implement a dummy filter function (we will refine this later)
+  filterJobs(): void {
+    console.log('Filtering Jobs:', { searchQuery: this.searchQuery, selectedStatus: this.selectedStatus });
+  }
+
+  // ✅ Reset search and filters
+  resetFilters(): void {
+    this.searchQuery = '';
+    this.selectedStatus = '';
+    this.filterJobs();
   }
 }

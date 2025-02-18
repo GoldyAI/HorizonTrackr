@@ -21,8 +21,8 @@ export class JobListComponent implements OnInit {
   selectedJob: Job | null = null;
   editMode: boolean = false;
 
-  searchQuery: string = ''; // ✅ Search Input Binding
-  selectedStatus: string = ''; // ✅ Filter Dropdown Binding
+  searchQuery: string = ''; // ✅ Search input binding
+  selectedStatus: string = ''; // ✅ Status filter binding
 
   private searchSubject = new Subject<void>(); // ✅ Used to debounce filtering
 
@@ -30,9 +30,9 @@ export class JobListComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadJobs();
-    
+
     // ✅ Add debounce time to search/filter for a smoother experience
-    this.searchSubject.pipe(debounceTime(500)).subscribe(() => {
+    this.searchSubject.pipe(debounceTime(300)).subscribe(() => {
       this.filterJobs();
     });
   }
@@ -41,7 +41,6 @@ export class JobListComponent implements OnInit {
   loadJobs(): void {
     this.jobService.getJobs().subscribe({
       next: (data: Job[]) => {
-        // ✅ Ensure dates are formatted correctly before displaying
         this.jobs = data.map(job => ({
           ...job,
           dateApplied: this.formatDate(job.dateApplied)
@@ -61,7 +60,7 @@ export class JobListComponent implements OnInit {
     this.searchSubject.next();
   }
 
-  /** ✅ Filter jobs based on search input & selected status **/
+  /** ✅ Apply filters: Search Query & Status **/
   filterJobs(): void {
     this.filteredJobs = this.jobs.filter(job => {
       const matchesSearch =
@@ -86,7 +85,6 @@ export class JobListComponent implements OnInit {
     if (confirm("Are you sure you want to delete this job?")) {
       this.jobService.deleteJob(id).subscribe({
         next: () => {
-          // ✅ Remove from both `jobs` and `filteredJobs` to update UI instantly
           this.jobs = this.jobs.filter(job => job.id !== id);
           this.filteredJobs = this.filteredJobs.filter(job => job.id !== id);
         },
@@ -140,6 +138,11 @@ export class JobListComponent implements OnInit {
     }
   }
 
+  /** ✅ Cancel Edit Mode (Fix for missing method) **/
+  cancelEdit(): void {
+    this.closeModal();
+  }
+
   /** ✅ Format dates for display **/
   formatDate(dateString: string | undefined): string {
     if (!dateString) return 'N/A';
@@ -149,11 +152,11 @@ export class JobListComponent implements OnInit {
 
   /** ✅ Get Bootstrap class for job status **/
   getStatusClass(status: string): string {
-    switch (status) {
-      case 'Applied': return 'badge bg-primary';
-      case 'Interview': return 'badge bg-info';
-      case 'Offer': return 'badge bg-success';
-      case 'Rejected': return 'badge bg-danger';
+    switch (status.toLowerCase()) {
+      case 'applied': return 'badge bg-primary';
+      case 'interview': return 'badge bg-info';
+      case 'offer': return 'badge bg-success';
+      case 'rejected': return 'badge bg-danger';
       default: return 'badge bg-secondary';
     }
   }

@@ -50,7 +50,7 @@
               {{ job.status }}
             </span>
           </td>
-          <td>{{ formatDate(job.dateApplied) }}</td>
+          <td>{{ job.dateApplied ? formatDate(job.dateApplied) : 'N/A' }}</td> <!-- ✅ Prevents empty dates -->
           <td>
             <button class="btn btn-sm btn-warning me-2" (click)="editJob(job)">✏️ Edit</button>
             <button class="btn btn-sm btn-danger" (click)="deleteJob(job.id)">🗑 Delete</button>
@@ -66,12 +66,12 @@
   </p>
 
   <!-- ✅ Bootstrap Modal for Editing Jobs -->
-  <div class="modal fade" id="editModal" tabindex="-1" aria-hidden="true">
+  <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title">✏️ Edit Job</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" (click)="cancelEdit()"></button>
         </div>
         <div class="modal-body">
           <form *ngIf="selectedJob" (ngSubmit)="updateJob()">
@@ -104,7 +104,7 @@
           </form>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">❌ Close</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" (click)="cancelEdit()">❌ Close</button>
         </div>
       </div>
     </div>

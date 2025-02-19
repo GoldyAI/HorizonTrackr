@@ -21,6 +21,7 @@ export class JobListComponent implements OnInit {
   selectedJob: Job | null = null;
   editMode: boolean = false;
   newJob: Job = { id: 0, company: '', position: '', status: 'Applied', dateApplied: '', notes: '' };
+  successMessage: string = '';
 
   searchQuery: string = '';
   selectedStatus: string = '';
@@ -113,6 +114,7 @@ export class JobListComponent implements OnInit {
   /** ✅ Open Bootstrap Modal for Adding a New Job **/
   openAddJobModal(): void {
     this.newJob = { id: 0, company: '', position: '', status: 'Applied', dateApplied: '', notes: '' };
+    this.successMessage = '';
 
     setTimeout(() => {
       const modalElement = document.getElementById("addJobModal") as HTMLElement;
@@ -123,7 +125,7 @@ export class JobListComponent implements OnInit {
     }, 100);
   }
 
-  /** ✅ Add a new job **/
+  /** ✅ Add a new job (Fix for Save Job button) **/
   addJob(): void {
     if (!this.newJob.company || !this.newJob.position || !this.newJob.dateApplied) {
       alert("Please fill in all required fields.");
@@ -135,26 +137,16 @@ export class JobListComponent implements OnInit {
         job.dateApplied = this.formatDate(job.dateApplied);
         this.jobs.push(job);
         this.filteredJobs.push(job);
+        this.successMessage = "Job saved successfully!";
+        setTimeout(() => (this.successMessage = ''), 3000);
         this.closeModal('addJobModal');
       },
-      error: (error) => console.error("Error adding job:", error)
+      error: (error) => {
+        console.error("Error adding job:", error);
+        alert("Job could not be saved. Please try again.");
+      }
     });
   }
-  /** ✅ Edit a job (opens the modal) **/
-editJob(job: Job): void {
-  this.selectedJob = { ...job }; // Clone the job to avoid direct mutations
-  this.editMode = true;
-
-  // ✅ Open Bootstrap modal for editing
-  setTimeout(() => {
-    const modalElement = document.getElementById("editJobModal") as HTMLElement;
-    if (modalElement) {
-      const modal = new bootstrap.Modal(modalElement);
-      modal.show();
-    }
-  }, 100);
-}
-
 
   /** ✅ Delete a job **/
   deleteJob(id: number): void {
@@ -169,8 +161,8 @@ editJob(job: Job): void {
     }
   }
 
-  /** ✅ Open Edit Job Modal **/
-  openEditJobModal(job: Job): void {
+  /** ✅ Edit a job (opens the modal) **/
+  editJob(job: Job): void {
     this.selectedJob = { ...job };
     this.editMode = true;
 
@@ -190,10 +182,8 @@ editJob(job: Job): void {
     this.jobService.updateJob(this.selectedJob).subscribe({
       next: (updatedJob: Job) => {
         updatedJob.dateApplied = this.formatDate(updatedJob.dateApplied);
-
         this.jobs = this.jobs.map(job => job.id === updatedJob.id ? updatedJob : job);
         this.filteredJobs = this.filteredJobs.map(job => job.id === updatedJob.id ? updatedJob : job);
-
         this.closeModal('editModal');
       },
       error: (error) => console.error("Error updating job:", error)

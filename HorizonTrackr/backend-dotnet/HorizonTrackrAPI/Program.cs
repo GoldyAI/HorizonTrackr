@@ -8,18 +8,24 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// ✅ Add Database Context
+// ✅ 1. Configure Database Context (SQLite)
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// ✅ Configure Identity for User Authentication
+// ✅ 2. Configure Identity (Only If Using Authentication)
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders();
 
-// ✅ Configure JWT Authentication
-var key = Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]);
+// ✅ 3. Configure JWT Authentication (Only If Using Authentication)
+var jwtKey = builder.Configuration["Jwt:Key"];
 
+if (string.IsNullOrEmpty(jwtKey))
+{
+    throw new InvalidOperationException("⚠️ JWT Secret Key is missing! Add it to `appsettings.json` or environment variables.");
+}
+
+var key = Encoding.UTF8.GetBytes(jwtKey);
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
@@ -37,34 +43,33 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 builder.Services.AddAuthorization();
 
-// ✅ Add CORS Policy for Angular & Backend Communication
+// ✅ 4. Configure CORS (IMPORTANT: Apply Globally)
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowAngularApp",
-        policy =>
-        {
-            policy.WithOrigins("http://localhost:4200", "http://localhost:5166", "https://localhost:7262") // Allow Angular & backend URLs
-                  .AllowAnyHeader()
-                  .AllowAnyMethod()
-                  .AllowCredentials();
-        });
+    options.AddPolicy("AllowAngularApp", policy =>
+    {
+        policy.WithOrigins("http://localhost:4200") // ✅ ALLOW ANGULAR FRONTEND
+              .AllowAnyHeader()
+              .AllowAnyMethod()
+              .AllowCredentials(); // ✅ REQUIRED FOR AUTHENTICATED REQUESTS
+    });
 });
 
-// ✅ Add Controllers
+// ✅ 5. Add Controllers & API Explorer
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-// ✅ Apply CORS Policy
+// ✅ 6. APPLY CORS FIRST IN MIDDLEWARE PIPELINE
 app.UseCors("AllowAngularApp");
 
-// ✅ Enable Authentication & Authorization
+// ✅ 7. Enable Authentication & Authorization
 app.UseAuthentication();
 app.UseAuthorization();
 
-// ✅ Configure the HTTP request pipeline
+// ✅ 8. Configure Middleware (Swagger, HTTPS)
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();

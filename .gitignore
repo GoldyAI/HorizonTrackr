@@ -18,3 +18,7 @@ refint/
 
 .fake
 node_modules/
+# Ignore SQLite temporary database files
+HorizonTrackr.db-shm
+HorizonTrackr.db-wal
+HorizonTrackr.db

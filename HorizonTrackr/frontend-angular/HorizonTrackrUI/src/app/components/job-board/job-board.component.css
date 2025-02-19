@@ -1,15 +1,99 @@
+/* ✅ Card Styling */
 .card {
     border-radius: 10px;
-    transition: transform 0.2s ease-in-out;
-  }
-  .card:hover {
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    padding: 12px; /* Reduced padding for a compact look */
+    min-height: 160px; /* Slightly reduced card height */
+}
+
+.card:hover {
     transform: scale(1.02);
-  }
-  .card-title {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* ✅ Job Title Styling */
+.card-title {
+    font-size: 0.95rem; /* Reduced font size for a compact look */
+    font-weight: bold;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* ✅ Employer Name */
+.card-body p {
+    font-size: 0.85rem; /* Slightly smaller text */
+    margin-bottom: 3px;
+    color: #6c757d; /* Lighter color for better readability */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* ✅ Adjust Button Sizes */
+.btn-sm {
+    padding: 6px 10px;
+    font-size: 0.8rem;
+}
+
+/* ✅ Make Grid Layout More Compact */
+.row.g-3 {
+    margin-right: -5px;
+    margin-left: -5px;
+}
+
+.col-md-4 {
+    padding-right: 5px;
+    padding-left: 5px;
+}
+
+/* ✅ Make Job Badges Smaller */
+.badge {
+    font-size: 0.7rem;
+    padding: 4px 6px;
+}
+
+/* ✅ Set a fixed height for job cards */
+.job-card {
+    height: 220px; /* Adjust as needed */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    overflow: hidden;
+}
+
+/* ✅ Ensure job title does not push the card size */
+.job-card h5 {
     font-size: 1rem;
     font-weight: bold;
-  }
-  .card-body p {
-    margin-bottom: 5px;
-  }
-  
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* ✅ Ensure company name and job details do not expand */
+.job-card p {
+    font-size: 0.85rem;
+    margin-bottom: 4px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* ✅ Buttons remain at the bottom */
+.job-card .d-flex {
+    margin-top: auto; 
+}
+
+/* ✅ Ensure badges and text wrap properly */
+.job-card .badge {
+    font-size: 0.75rem;
+    padding: 5px 8px;
+}
+/* ✅ Company Logo Styling */
+.company-logo {
+    width: 40px; /* Adjust size */
+    height: 40px;
+    object-fit: contain; /* Prevent distortion */
+    border-radius: 5px; /* Rounded corners */
+}

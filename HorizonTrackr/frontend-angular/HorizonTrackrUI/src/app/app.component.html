@@ -1,14 +1,14 @@
-<!-- ✅ Bootstrap Navbar -->
+<!-- ✅ Navbar -->
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
   <div class="container-fluid">
-    <a class="navbar-brand" href="#">HorizonTrackr</a>
+    <a class="navbar-brand" routerLink="/">HorizonTrackr</a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
       <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarNav">
       <ul class="navbar-nav ms-auto">
-        <li class="nav-item"><a class="nav-link" href="#">Home</a></li>
-        <li class="nav-item"><a class="nav-link" href="#">Jobs</a></li>
+        <li class="nav-item"><a class="nav-link" routerLink="/">Home</a></li>
+        <li class="nav-item"><a class="nav-link" routerLink="/jobs">Jobs</a></li>
         <li class="nav-item"><a class="nav-link" href="#">About</a></li>
         <li class="nav-item"><a class="nav-link" href="#">Contact</a></li>
       </ul>
@@ -16,11 +16,7 @@
   </div>
 </nav>
 
-<!-- ✅ Page Layout -->
+<!-- ✅ Page Content -->
 <div class="container mt-4">
-  <div class="row">
-    <main class="col-md-12">
-      <app-job-list></app-job-list> <!-- ✅ Only keep the job list -->
-    </main>
-  </div>
+  <router-outlet></router-outlet>
 </div>

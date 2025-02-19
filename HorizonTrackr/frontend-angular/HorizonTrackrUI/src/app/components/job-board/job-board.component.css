@@ -1,0 +1,15 @@
+.card {
+    border-radius: 10px;
+    transition: transform 0.2s ease-in-out;
+  }
+  .card:hover {
+    transform: scale(1.02);
+  }
+  .card-title {
+    font-size: 1rem;
+    font-weight: bold;
+  }
+  .card-body p {
+    margin-bottom: 5px;
+  }
+  

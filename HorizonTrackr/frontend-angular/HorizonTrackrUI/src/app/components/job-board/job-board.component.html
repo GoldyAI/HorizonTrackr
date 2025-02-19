@@ -1,0 +1,73 @@
+<div class="container mt-4">
+    <h2 class="text-center mb-3">🌍 Job Listings</h2>
+  
+    <!-- ✅ Search Bar -->
+    <div class="row mb-3">
+      <div class="col-md-8">
+        <input 
+          type="text" 
+          class="form-control" 
+          placeholder="🔍 Search jobs by title or company..."
+          [(ngModel)]="searchQuery"
+        />
+      </div>
+      <div class="col-md-4">
+        <button class="btn btn-primary w-100" (click)="fetchJobs()">🔍 Search</button>
+      </div>
+    </div>
+  
+    <!-- ✅ Show "Start Searching" message before first search -->
+    <div *ngIf="!hasSearched" class="text-center mt-4">
+      <h4 class="text-muted">✨ Start Searching Now!</h4>
+      <p>Find your dream job today! Enter a job title or company above.</p>
+    </div>
+  
+    <!-- ✅ Show recommended jobs if no search has been performed -->
+    <div *ngIf="!hasSearched && recommendedJobs.length > 0">
+      <h4 class="mb-3">🔥 Recommended Jobs</h4>
+      <div class="card mb-3" *ngFor="let job of recommendedJobs">
+        <div class="card-body">
+          <h5 class="card-title">{{ job.job_title }}</h5>
+          <h6 class="card-subtitle text-muted">{{ job.employer_name }}</h6>
+          <p class="card-text">📍 {{ job.job_city }}, {{ job.job_country }}</p>
+  
+          <!-- ✅ Apply & Save Buttons -->
+          <div class="mt-3">
+            <a [href]="job.job_apply_link" target="_blank" class="btn btn-primary me-2">🚀 Apply Now</a>
+            <button class="btn btn-success" (click)="saveJob(job)">✅ Save Job</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  
+    <!-- ✅ Show job listings after search -->
+    <div *ngIf="hasSearched && !loading && filteredJobs.length > 0">
+      <h4 class="mb-3">🔍 Search Results</h4>
+      <div class="card mb-3" *ngFor="let job of filteredJobs">
+        <div class="card-body">
+          <h5 class="card-title">{{ job.job_title }}</h5>
+          <h6 class="card-subtitle text-muted">{{ job.employer_name }}</h6>
+          <p class="card-text">📍 {{ job.job_city }}, {{ job.job_country }}</p>
+  
+          <!-- ✅ Apply & Save Buttons -->
+          <div class="mt-3">
+            <a [href]="job.job_apply_link" target="_blank" class="btn btn-primary me-2">🚀 Apply Now</a>
+            <button class="btn btn-success" (click)="saveJob(job)">✅ Save Job</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  
+    <!-- ✅ No Jobs Found Message -->
+    <p *ngIf="hasSearched && !loading && filteredJobs.length === 0" class="text-center text-muted">
+      🚀 No jobs found. Try searching again!
+    </p>
+  
+    <!-- ✅ Pagination Controls -->
+    <div *ngIf="hasSearched" class="d-flex justify-content-center mt-4">
+      <button class="btn btn-outline-secondary me-2" (click)="prevPage()" [disabled]="page === 1">⬅️ Previous</button>
+      <span class="align-self-center">Page {{ page }}</span>
+      <button class="btn btn-outline-secondary ms-2" (click)="nextPage()">Next ➡️</button>
+    </div>
+  </div>
+  

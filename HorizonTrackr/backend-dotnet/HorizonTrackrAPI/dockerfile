@@ -1,23 +1,23 @@
-FROM mcr.microsoft.com/dotnet/aspnet:9.0-nanoserver-1809 AS base
+# Use the official .NET 8 SDK as the build environment
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /app
-EXPOSE 5166
 
-ENV ASPNETCORE_URLS=http://+:5166
+# Copy everything and restore dependencies
+COPY . ./
+RUN dotnet restore
 
-FROM mcr.microsoft.com/dotnet/sdk:9.0-nanoserver-1809 AS build
-ARG configuration=Release
-WORKDIR /src
-COPY ["HorizonTrackr/backend-dotnet/HorizonTrackrAPI/HorizonTrackrAPI.csproj", "HorizonTrackr/backend-dotnet/HorizonTrackrAPI/"]
-RUN dotnet restore "HorizonTrackr\backend-dotnet\HorizonTrackrAPI\HorizonTrackrAPI.csproj"
-COPY . .
-WORKDIR "/src/HorizonTrackr/backend-dotnet/HorizonTrackrAPI"
-RUN dotnet build "HorizonTrackrAPI.csproj" -c $configuration -o /app/build
+# Publish the application
+RUN dotnet publish -c Release -o /out
 
-FROM build AS publish
-ARG configuration=Release
-RUN dotnet publish "HorizonTrackrAPI.csproj" -c $configuration -o /app/publish /p:UseAppHost=false
-
-FROM base AS final
+# Use the runtime image for final execution
+FROM mcr.microsoft.com/dotnet/aspnet:8.0
 WORKDIR /app
-COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "HorizonTrackrAPI.dll"]
+
+# Copy the built application from the build stage
+COPY --from=build /out ./
+
+# Expose the port that your app listens on
+EXPOSE 8080
+
+# Start the application
+CMD ["dotnet", "HorizonTrackrAPI.dll"]

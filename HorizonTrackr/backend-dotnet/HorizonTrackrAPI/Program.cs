@@ -43,17 +43,20 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 builder.Services.AddAuthorization();
 
-// ✅ 4. Configure CORS (IMPORTANT: Apply Globally)
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowAngularApp", policy =>
+    options.AddPolicy("AllowFrontend", policy =>
     {
-        policy.WithOrigins("http://localhost:4200") // ✅ ALLOW ANGULAR FRONTEND
-              .AllowAnyHeader()
-              .AllowAnyMethod()
-              .AllowCredentials(); // ✅ REQUIRED FOR AUTHENTICATED REQUESTS
+        policy.WithOrigins(
+            "http://localhost:4200", // ✅ Local Development
+            "https://horizon.goldydev.com" // ✅ Netlify Production
+        )
+        .AllowAnyHeader()
+        .AllowAnyMethod()
+        .AllowCredentials();
     });
 });
+
 
 // ✅ 5. Add Controllers & API Explorer
 builder.Services.AddControllers();
@@ -63,7 +66,8 @@ builder.Services.AddSwaggerGen();
 var app = builder.Build();
 
 // ✅ 6. APPLY CORS FIRST IN MIDDLEWARE PIPELINE
-app.UseCors("AllowAngularApp");
+app.UseCors("AllowFrontend");
+
 
 // ✅ 7. Enable Authentication & Authorization
 app.UseAuthentication();
